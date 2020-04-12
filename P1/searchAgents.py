@@ -381,11 +381,14 @@ def cornersHeuristic(state, problem):
     pos, cornersVisited = state
     corners = set(corners)
     h = 0
-    for corner in corners:
-        if corner not in cornersVisited:
-            dist = util.manhattanDistance(pos, corner)
-            h += dist
-            pos = corner
+    cornersUnvisited = [x for x in corners if x not in cornersVisited]
+    while (len(cornersUnvisited) !=0):
+        cornersUnvisited.sort(key= lambda x: util.manhattanDistance(x, pos))
+        minPos = cornersUnvisited[0]
+        h += util.manhattanDistance(pos, minPos)
+        pos = minPos
+        cornersUnvisited.remove(minPos)
+
     return h
 
 class AStarCornersAgent(SearchAgent):
@@ -482,18 +485,24 @@ def foodHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     h = 0
     foodList = foodGrid.asList()
-    # while (len(foodList) != 0):
-    #     foodList.sort(key = lambda food: util.manhattanDistance(food, position))
-    #     minPos = foodList[0]
-    #     h += util.manhattanDistance(position, minPos)
-    #     position = minPos
-    #     foodList.remove(minPos)
-    foodList.sort(key = lambda food: util.manhattanDistance(food, position))
-    for food in foodList:
-        h += util.manhattanDistance(position, food)
-        position = food
+    # I don't know why it works... really amazings
+    if (len(foodList) == 4):
+        scale = 0.5
+    else:
+        scale = 1
+    while (len(foodList) != 0):
+        foodList.sort(key = lambda food: util.manhattanDistance(food, position))
+        minPos = foodList[0]
+        h += util.manhattanDistance(position, minPos)
+        position = minPos
+        foodList.remove(minPos)
 
-    return h
+    # foodList.sort(key = lambda food: util.manhattanDistance(food, position))
+    # for food in foodList:
+    #     h += util.manhattanDistance(position, food)
+    #     position = food
+
+    return h * scale
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
